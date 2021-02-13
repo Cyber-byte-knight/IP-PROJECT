@@ -1,0 +1,172 @@
+import sqlite3, sys
+from tkinter import *
+import tkinter
+import tkinter.font
+from tkinter import messagebox
+
+root = Tk()
+root.geometry("1280x720")
+root.resizable(width=False, height=False)
+root.title("Student Management System")
+root.configure(bg="gray9")
+
+font1 = tkinter.font.Font(family="Cambria", size=15, weight="bold")
+font2 = tkinter.font.Font(family="Constantia", size=15)
+font3 = tkinter.font.Font(family="Constantia", size=12,)
+
+def input_validator():
+    s1 = student_name.get()
+    s2 = father.get()
+    try:
+        s3 = int(student_class.get())
+    except:
+        messagebox.showwarning("Invalid Input", "Class should be a valid Integer Value !")
+    try:
+        s4 = int(roll_no.get())
+    except:
+        messagebox.showwarning("Invalid Input", "Roll Number should be a valid Integer Value !")
+    try:
+        s5 = int(phone.get())
+    except:
+        messagebox.showwarning("Invalid Input", "Phone Number should be a valid Integer Value")
+    s6 = address.get()
+
+
+def connection():
+    try:
+        conn = sqlite3.connect("student.db")
+    except:
+        print("cannot connect to the database")
+    return conn
+
+
+def verifier():
+    a = b = c = d = e = f = 0
+    if not student_name.get():
+        text1.insert(END, "Name of the student is required !\n")
+        a = 1
+    if not father.get():
+        text1.insert(END, "Father's Name is required !\n")
+        b = 1
+    if not student_class.get():
+        text1.insert(END, "Class of the student is required !\n")
+        c = 1
+    if not roll_no.get():
+        text1.insert(END, "Roll No. of the student is required !\n")
+        d = 1
+    if not phone.get():
+        text1.insert(END, "Phone Number is Required !\n")
+        e = 1
+    if not address.get():
+        text1.insert(END, "Address is required !")
+        f = 1
+    if a == 1 or b == 1 or c == 1 or d == 1 or e == 1 or f == 1:
+        return 1
+    else:
+        return 0
+
+def add_student():
+    ret = verifier()
+    if ret == 0:
+        conn = connection()
+        cur = conn.cursor()
+        cur.execute("CREATE TABLE IF NOT EXISTS STUDENTS (NAME TEXT, FATHERNAME TEXT, CLASS INTEGER, ROLLNO INTEGER, PHONE INTEGER, ADDRESS TEXT)")
+        input_validator()
+        cur.execute("insert into STUDENTS values(?,?,?,?,?,?)", (s1, s2, s3, s4, s5, s6))
+        conn.commit()
+        conn.close()
+        text1.insert(END, "ADDED SUCCESSFULLY\n")
+
+def delete_student():
+    
+    conn = connection()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM STUDENTS WHERE ROLLNO=?", (int(roll_no.get()),))
+    conn.commit()
+    conn.close()
+    text1.insert(END, "Successfully Deleted the Info.\n")
+
+def view_student():
+    conn = connection()
+    cur = conn.cursor()
+    cur.execute("select * from STUDENTS")
+    data = cur.fetchall()
+    conn.close()
+    for i in data:
+        text1.insert(END, str(i) + "\n")
+
+def update_student():
+    ret = verifier()
+    if ret == 0:
+        conn = connection()
+        cur = conn.cursor()
+        input_validator()
+        cur.execute("UPDATE STUDENTS SET NAME=?,FATHERNAME=?,CLASS=?,ROLLNO=?,PHONE=?, ADDRESS=?, where ROLL_NO=?", (
+        student_name.get(), father.get(), int(student_class.get()), int(roll_no.get()), int(phone.get()), address.get()))
+        conn.commit()
+        conn.close()
+        text1.insert(END, "UPDATED SUCCESSFULLY\n")
+
+def clear():
+    entry1.delete(0, END)
+    entry2.delete(0, END)
+    entry3.delete(0, END)
+    entry4.delete(0, END)
+    entry6.delete(0, END)
+    entry7.delete(0, END)
+
+
+
+def close():
+    sys.exit()
+	
+
+student_name = StringVar()
+father = StringVar()
+student_class = StringVar()
+section = StringVar()
+roll_no = StringVar()
+phone = StringVar()
+address = StringVar()
+
+label1 = Label(root, text="Student Name", bg="gray9", fg="orangered2", font=font1)
+entry1 = Entry(root, textvariable=student_name, bg="gray9", fg="green4", font=font1)
+label1.place(x=5, y=5)
+entry1.place(x=190, y=5)
+
+label2 = Label(root, text="Father's Name", bg="gray9", fg="orangered2", font=font1)
+entry2 = Entry(root, textvariable=father,  bg="gray9", fg="green4", font=font1)
+label2.place(x=5, y=35)
+entry2.place(x=190, y=35)
+
+label3 = Label(root, text="Class", bg="gray9", fg="orangered2", font=font1)
+entry3 = Entry(root, textvariable=student_class, bg="gray9", fg="green4", font=font1)
+label3.place(x=5, y=65)
+entry3.place(x=190, y=65)
+
+label4 = Label(root, text="Roll No", bg="gray9", fg="orangered2", font=font1)
+entry4 = Entry(root, textvariable=roll_no, bg="gray9", fg="green4", font=font1)
+label4.place(x=5, y=95)
+entry4.place(x=190, y=95)
+
+label6 = Label(root,  text="Phone No.", bg="gray9", fg="orangered2", font=font1)
+entry6 = Entry(root, textvariable=phone, bg="gray9", fg="green4", font=font1)
+label6.place(x=5, y=125)
+entry6.place(x=190, y=125)
+
+label7 = Label(root, text="Address", bg="gray9", fg="orangered2", font=font1)
+entry7 = Entry(root, textvariable=address, bg="gray9", fg="green4", font=font1)
+label7.place(x=5, y=155)
+entry7.place(x=190, y=155)
+
+button1 = Button(root, text="Add Student", font=font3, bg="gray9", fg="forestgreen", padx=25, pady=15, command=add_student).place(x=45, y=480)
+button2 = Button(root, text="Delete Student", font=font3, bg="gray9", fg="forestgreen", padx=25, pady=15, command=delete_student).place(x=250, y=480)
+button3 = Button(root, text="View all Students", font=font3, bg="gray9", fg="forestgreen", padx=25, pady=15, command=view_student).place(x=27, y=550)
+button4 = Button(root, text="Update Info", font=font3, bg="gray9", fg="forestgreen", padx=25, pady=15, command=update_student).place(x=250, y=550)
+button5 = Button(root, text="Close", font=font3, bg="gray9", fg="forestgreen", padx=100, pady=15, command=close).place(x=45, y=650)
+button6 = Button(root, text="Clear", font=font3, bg="gray9", fg="forestgreen", padx=100, pady=15, command=clear).place(x=500, y=650)
+
+text1 = Text(root, width=68, height=25, bg="gray1", fg="white", font=font2)
+text1.place(x=500, y=19)
+
+root.mainloop()
