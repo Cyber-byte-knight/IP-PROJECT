@@ -1,0 +1,169 @@
+import mysql.connector
+from tkinter import *
+import tkinter
+import tkinter.font
+from tkinter import messagebox
+import sys
+
+root = Tk()
+root.geometry("1280x720")
+root.resizable(width=False, height=False)
+root.title("Student Management System")
+root.configure(bg="gray9")
+
+font1 = tkinter.font.Font(family="Cambria", size=15, weight="bold")
+font2 = tkinter.font.Font(family="Constantia", size=15)
+font3 = tkinter.font.Font(family="Constantia", size=12, )
+
+mydb = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="root",
+    database="mydatabase"
+)
+myc = mydb.cursor()
+
+def adder():
+    a1 = str(entry1.get())
+    b1 = str(entry2.get())
+    c1 = int(entry3.get())
+    d1 = int(entry4.get())
+    e1 = int(entry5.get())
+
+    myc.execute("CREATE TABLE IF NOT EXISTS STUDENTS ( NAME CHAR(20), FATHER CHAR(20), CLASS INT(2), ROLL_NUMBER INT, PHONE_NO BIGINT );")
+    sql1 = "INSERT INTO STUDENTS (NAME, FATHER, CLASS, ROLL_NUMBER, PHONE_NO) VALUES (%s, %s, %s, %s, %s)"
+    val1 = (a1, b1, c1, d1, e1)
+    myc.execute(sql1, val1)
+    mydb.commit()
+    messagebox.showinfo("Sucessfull", "Information added sucessfully !")
+
+
+def deleter():
+    d2 = int(entry4.get())
+    sql2 = "DELETE FROM STUDENTS WHERE ROLL_NUMBER = %s"
+    val2 = (d2,)
+    myc.execute(sql2, val2)
+    mydb.commit()
+    messagebox.showwarning("Deleted", "Inforamtion DELETED !!!")
+
+
+def viewer():
+    myc.execute("SELECT * FROM STUDENTS")
+    result = myc.fetchall()
+    text1.delete(1.0, END)
+    for x in result:
+        text1.insert(END, str(x) + "\n")
+
+
+
+def updater():
+    newwin = Toplevel(root)
+    newwin.geometry("480x480")
+    newwin.title("UPDATER")
+    newwin.configure(bg="gray9")
+    newwin.resizable(width=False, height=False)
+
+    def update():
+        a4 = entry6.get()     #UPDATER ROLL
+        b4 = entry7.get()   #NAME
+        c4 = entry8.get()   #FATHER
+        d4 = entry9.get()   #CLASS
+        e4 = entry10.get()  #ROLL
+        f4 = entry11.get()  #PHONE
+
+
+        sql = "UPDATE STUDENTS SET NAME = %s, FATHER = %s, CLASS = %s, ROLL_NUMBER = %s, PHONE_NO = %s WHERE ROLL_NUMBER = %s"
+        val = (b4, c4, d4, e4, f4, a4)
+        myc.execute(sql, val)
+        mydb.commit()
+        newwin.destroy()
+        messagebox.showinfo("Sucessfull0, Information Updated Sucessfully.")
+
+    font3 = tkinter.font.Font(family="Constantia", size=10)
+
+    label6 = Label(newwin, text="Roll Number of the Student ->", font=font3, bg="gray9", fg="orangered2")
+    label6.place(x=5, y=5)
+    entry6 = Entry(newwin, font=font3, bg="gray9", fg="green4")
+    entry6.place(x=230, y=5)
+
+    label7 = Label(newwin, text="Name(NEW/OLD) ->", font=font3, bg="gray9", fg="orangered2")
+    label7.place(x=5, y=35)
+    entry7 = Entry(newwin, font=font3, bg="gray9", fg="green4")
+    entry7.place(x=230, y=35)
+
+    label8 = Label(newwin, text="Father's Name (NEW/OLD) ->", font=font3, bg="gray9", fg="orangered2")
+    label8.place(x=5, y=65)
+    entry8 = Entry(newwin, font=font3, bg="gray9", fg="green4")
+    entry8.place(x=230, y=65)
+
+    label9 = Label(newwin, text="Class (NEW/OLD) ->", font=font3, bg="gray9", fg="orangered2")
+    label9.place(x=5, y=95)
+    entry9 = Entry(newwin, font=font3, bg="gray9", fg="green4")
+    entry9.place(x=230, y=95)
+
+    label10 = Label(newwin, text="Roll Number (OLD/NEW) ->", font=font3, bg="gray9", fg="orangered2")
+    label10.place(x=5, y=125)
+    entry10 = Entry(newwin, font=font3, bg="gray9", fg="green4")
+    entry10.place(x=230, y=125)
+
+    label11 = Label(newwin, text="Phone Number (OLD/NEW) ->", font=font3, bg="gray9", fg="orangered2")
+    label11.place(x=5, y=155)
+    entry11 = Entry(newwin, font=font3, bg="gray9", fg="green4")
+    entry11.place(x=230, y=155)
+
+    button7 = Button(newwin, text="Update", font=font3, padx=150, pady=15, bg="gray9", fg="orangered2", command=update)
+    button7.place(x=20, y=200)
+
+
+def closer():
+    sys.exit()
+
+
+def cleaner():
+    entry1.delete(0, END)
+    entry2.delete(0, END)
+    entry3.delete(0, END)
+    entry4.delete(0, END)
+    entry5.delete(0, END)
+
+
+label1 = Label(root, text="Student Name", bg="gray9", fg="orangered2", font=font1)
+entry1 = Entry(root, bg="gray9", fg="green4", font=font1)
+label1.place(x=5, y=5)
+entry1.place(x=190, y=5)
+
+label2 = Label(root, text="Father's Name", bg="gray9", fg="orangered2", font=font1)
+entry2 = Entry(root, bg="gray9", fg="green4", font=font1)
+label2.place(x=5, y=35)
+entry2.place(x=190, y=35)
+
+label3 = Label(root, text="Class", bg="gray9", fg="orangered2", font=font1)
+entry3 = Entry(root, bg="gray9", fg="green4", font=font1)
+label3.place(x=5, y=65)
+entry3.place(x=190, y=65)
+
+label4 = Label(root, text="Roll No", bg="gray9", fg="orangered2", font=font1)
+entry4 = Entry(root, bg="gray9", fg="green4", font=font1)
+label4.place(x=5, y=95)
+entry4.place(x=190, y=95)
+
+label5 = Label(root, text="Phone No.", bg="gray9", fg="orangered2", font=font1)
+entry5 = Entry(root, bg="gray9", fg="green4", font=font1)
+label5.place(x=5, y=125)
+entry5.place(x=190, y=125)
+
+
+button1 = Button(root, text="Add Student", font=font3, bg="gray9", fg="forestgreen", padx=25, pady=15, command=adder).place(x=45, y=480)
+button2 = Button(root, text="Delete Student", font=font3, bg="gray9", fg="forestgreen", command=deleter, padx=25, pady=15).place(x=250, y=480)
+button3 = Button(root, text="View all Students", font=font3, bg="gray9", fg="forestgreen", command=viewer, padx=25, pady=15).place(x=27, y=550)
+button4 = Button(root, text="Update Info", font=font3, bg="gray9", fg="forestgreen", command=updater, padx=25, pady=15).place(x=250, y=550)
+button5 = Button(root, text="Close", font=font3, bg="gray9", fg="forestgreen", padx=100, pady=15, command=closer).place(
+    x=45, y=650)
+button6 = Button(root, text="Clear", font=font3, bg="gray9", fg="forestgreen", padx=100, pady=15, command=cleaner).place(
+    x=500, y=650)
+
+text1 = Text(root, width=68, height=25, bg="gray1", fg="white", font=font2)
+text1.place(x=500, y=19)
+
+root.mainloop()
+
